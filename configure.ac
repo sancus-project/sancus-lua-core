@@ -12,8 +12,17 @@ PKG_CHECK_MODULES(LUA, [${lua_pc}])
 
 install_lmod=`pkg-config --variable=INSTALL_LMOD ${lua_pc}`
 if test "x${install_lmod}" = x; then
-	AC_MSG_ERROR([${lua_pc}:no INSTALL_LMOD detected])
+	lua_prefix=`pkg-config --variable=prefix ${lua_pc}`
+	lua_ver=`pkg-config --variable=V ${lua_pc}`
+	if test "x${lua_ver}" = x; then
+		lua_ver=`pkg-config --variable=major_version ${lua_pc}`
+		if test "x{lua_ver}" = x; then
+			AC_MSG_ERROR([${lua_pc}.pc:no INSTALL_LMOD/V/major_version found])
+		fi
+	fi
+	install_lmod=${lua_prefix}/share/lua/${lua_ver}
 fi
+INSTALL_LMOD=${install_lmod}
 AC_SUBST(INSTALL_LMOD)
 
 AC_CONFIG_FILES([Makefile
