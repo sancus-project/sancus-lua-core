@@ -10,20 +10,31 @@ AM_INIT_AUTOMAKE([foreign dist-bzip2 -Wall -Werror])
 PKG_CHECK_EXISTS([lua], lua_pc='lua', lua_pc='lua5.1')
 PKG_CHECK_MODULES(LUA, [${lua_pc}])
 
-install_lmod=`pkg-config --variable=INSTALL_LMOD ${lua_pc}`
+# --with-install-lmod
+#
+AC_MSG_CHECKING([where to install lua modules])
+AC_ARG_WITH([install-lmod],
+	    [AS_HELP_STRING([--with-install-lmod], [where to install lua modules])],
+	    [install_lmod="$withval"],
+	    [install_lmod=""])
+
 if test "x${install_lmod}" = x; then
-	lua_prefix=`pkg-config --variable=prefix ${lua_pc}`
-	lua_ver=`pkg-config --variable=V ${lua_pc}`
-	if test "x${lua_ver}" = x; then
-		lua_ver=`pkg-config --variable=major_version ${lua_pc}`
-		if test "x{lua_ver}" = x; then
-			AC_MSG_ERROR([${lua_pc}.pc:no INSTALL_LMOD/V/major_version found])
+	install_lmod=`pkg-config --variable=INSTALL_LMOD ${lua_pc}`
+	if test "x${install_lmod}" = x; then
+		# INSTALL_LMOD undefined, compose one
+		lua_prefix=`pkg-config --variable=prefix ${lua_pc}`
+		lua_ver=`pkg-config --variable=V ${lua_pc}`
+		if test "x${lua_ver}" = x; then
+			lua_ver=`pkg-config --variable=major_version ${lua_pc}`
+			if test "x{lua_ver}" = x; then
+				AC_MSG_ERROR([${lua_pc}.pc:no INSTALL_LMOD/V/major_version found])
+			fi
 		fi
+		install_lmod=${lua_prefix}/share/lua/${lua_ver}
 	fi
-	install_lmod=${lua_prefix}/share/lua/${lua_ver}
 fi
-INSTALL_LMOD=${install_lmod}
-AC_SUBST(INSTALL_LMOD)
+AC_MSG_RESULT([$install_lmod])
+AC_SUBST(INSTALL_LMOD, ${install_lmod})
 
 AC_CONFIG_FILES([Makefile
 		 doc/Makefile
