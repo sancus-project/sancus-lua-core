@@ -1,0 +1,7 @@
+prefix=@prefix@
+
+INSTALL_LMOD=@INSTALL_LMOD@
+
+Name: @PACKAGE_NAME@
+Version: @PACKAGE_VERSION@
+Description: lua helpers and bindings for sancus-core
