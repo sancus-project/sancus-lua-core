@@ -7,6 +7,7 @@
 -- http://lua-users.org/wiki/TableSerialization
 local function pformat(o, name, indent)
 	local buf1, buf2 = '', ''
+	indent = indent or ''
 
 	-- simple serialization of everything except tables
 	local function serialize(o)
@@ -59,17 +60,29 @@ local function pformat(o, name, indent)
 		end
 	end
 
-	name = (name~=nil and tostring(name) or '__unnamed__')
-	indent = indent or ''
-
-	if type(o) ~= 'table' then
+	if name == nil then
+		if type(o) ~= 'table' then
+			return serialize(o)
+		elseif next(o) == nil then
+			return '{}'
+		else
+			local cache = {}
+			cache[o] = '__unnamed__'
+			buf1 = '{\n'
+			for k,v in pairs(o) do
+				k = string.format('[%s]', serialize(k))
+				stepin(v, k, indent..'   ', cache, k)
+			end
+			buf1 = buf1 .. indent .. '}'
+		end
+	elseif type(o) ~= 'table' then
 		-- simple datum
-		return name .. ' = ' .. serialize(o) .. ';\n'
+		return tostring(name) .. ' = ' .. serialize(o) .. ';\n'
 	else
 		-- table, let's unwind
-		stepin(o, name, indent, {}, name)
-		return buf1 .. buf2
+		stepin(o, name, indent or '', {}, name)
 	end
+	return buf1 .. buf2
 end
 
 local function pprint(t, name)
