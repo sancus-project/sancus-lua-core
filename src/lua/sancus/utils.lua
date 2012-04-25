@@ -46,7 +46,7 @@ local function pformat(o, name, indent)
 		else
 			-- new table
 			cache[o] = name
-			if #o == 0 then
+			if next(o) == nil then -- empty table
 				buf1 = buf1 .. ' = {};\n'
 			else
 				buf1 = buf1 .. ' = {\n'
