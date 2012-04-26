@@ -3,9 +3,17 @@
 -- Copyright (c) 2012, Alejandro Mery <amery@geeks.cl>
 --
 
+local _M = {}
+
+-- write to stderr
+--
+function _M.stderr(...)
+	return io.stderr:write(...)
+end
+
 -- based on table.show() from
 -- http://lua-users.org/wiki/TableSerialization
-local function pformat(o, name, indent)
+function _M.pformat(o, name, indent)
 	local buf1, buf2 = '', ''
 	indent = indent or ''
 
@@ -85,11 +93,8 @@ local function pformat(o, name, indent)
 	return buf1 .. buf2
 end
 
-local function pprint(t, name)
-	print(pformat(t, name))
+function _M.pprint(t, name)
+	print(_M.pformat(t, name))
 end
 
-return {
-	pformat = pformat,
-	pprint = pprint,
-}
+return _M
