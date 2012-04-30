@@ -1,4 +1,4 @@
-AC_INIT(sancus-core-lua, 0.0, amery@geeks.cl)
+AC_INIT(sancus-lua-core, 0.0, amery@geeks.cl)
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
@@ -36,7 +36,7 @@ fi
 AC_MSG_RESULT([$install_lmod])
 AC_SUBST(INSTALL_LMOD, ${install_lmod})
 
-AC_CONFIG_FILES([sancus-core-lua.pc])
+AC_CONFIG_FILES([sancus-lua-core.pc])
 AC_CONFIG_FILES([Makefile
 		 doc/Makefile
 		 src/lua/Makefile
