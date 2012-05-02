@@ -36,7 +36,7 @@ fi
 AC_MSG_RESULT([$install_lmod])
 AC_SUBST(INSTALL_LMOD, ${install_lmod})
 
-AC_CONFIG_FILES([sancus-lua-core.pc])
+AC_CONFIG_FILES([sancus-lua.pc])
 AC_CONFIG_FILES([Makefile
 		 doc/Makefile
 		 src/lua/Makefile
