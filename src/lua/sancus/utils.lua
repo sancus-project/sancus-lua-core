@@ -11,6 +11,25 @@ function _M.stderr(...)
 	return io.stderr:write(...)
 end
 
+--
+function _M.sibling_modules()
+	local source = debug.getinfo(2).source
+	local basedir, me = source:match("^@(.*[/\\])([^/\\]+)$")
+	local t = {}
+
+	if basedir then
+		for f in lfs.dir(basedir) do
+			if f ~= me then
+				local f, e = f:match("^(.*)%.([^.]+)$")
+				if e == "lua" or e == "so" or e == "dll" then
+					t[#t+1] = f
+				end
+			end
+		end
+	end
+	return t
+end
+
 -- based on table.show() from
 -- http://lua-users.org/wiki/TableSerialization
 function _M.pformat(o, name, indent)
