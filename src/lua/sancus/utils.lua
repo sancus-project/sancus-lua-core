@@ -3,12 +3,27 @@
 -- Copyright (c) 2012, Alejandro Mery <amery@geeks.cl>
 --
 
-local _M = {}
+local _M = {
+	_stdout = io.stdout,
+	_stderr = io.stderr,
+}
+
+assert(io.stdout.setvbuf, "io.stdout has been kidnapped before we could save it")
 
 -- write to stderr
 --
 function _M.stderr(...)
-	return io.stderr:write(...)
+	return _M._stderr:write(...)
+end
+
+-- write to stdout
+--
+function _M.stdout(...)
+	return _M._stdout:write(...)
+end
+
+function _M.stdout_buf(mode, size)
+	_M._stdout:setvbuf(mode, size)
 end
 
 --
@@ -113,7 +128,7 @@ function _M.pformat(o, name, indent)
 end
 
 function _M.pprint(t, name)
-	print(_M.pformat(t, name))
+	_M.stdout(_M.pformat(t, name))
 end
 
 return _M
