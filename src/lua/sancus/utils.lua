@@ -13,13 +13,21 @@ assert(io.stdout.setvbuf, "io.stdout has been kidnapped before we could save it"
 -- write to stderr
 --
 function _M.stderr(...)
-	return _M._stderr:write(...)
+	if select('#', ...) > 1 then
+		return _M._stderr:write(string.format(...))
+	else
+		return _M._stderr:write(...)
+	end
 end
 
 -- write to stdout
 --
 function _M.stdout(...)
-	return _M._stdout:write(...)
+	if select('#', ...) > 1 then
+		return _M._stdout:write(string.format(...))
+	else
+		return _M._stdout:write(...)
+	end
 end
 
 function _M.stdout_buf(mode, size)
