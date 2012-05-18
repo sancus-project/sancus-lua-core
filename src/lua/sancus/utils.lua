@@ -59,16 +59,17 @@ function _M.pformat(o, name, indent)
 	local buf1, buf2 = '', ''
 	indent = indent or ''
 
+	local function has__tostring(o)
+		local mt = getmetatable(o)
+		return (mt ~= nil and mt.__tostring ~= nil)
+	end
+
 	-- simple serialization of everything except tables
 	local function serialize(o)
 		local s = tostring(o)
 		local t = type(o)
 
-		if o == nil then
-			return 'nil'
-		elseif t == 'boolean' then
-			return o and 'true' or 'false'
-		elseif t == 'number' then
+		if t == 'nil' or t == 'boolean' or t == 'number' or has__tostring(o) then
 			return s
 		elseif t == 'function' then
 			local info = debug.getinfo(o, 'S')
@@ -87,7 +88,7 @@ function _M.pformat(o, name, indent)
 	local function stepin(o, name, indent, cache, field)
 		buf1 = buf1 .. indent .. field
 
-		if type(o) ~= 'table' then
+		if has__tostring(o) or type(o) ~= 'table' then
 			-- simple datum
 			buf1 = buf1 .. ' = ' .. serialize(o) .. ';\n'
 		elseif cache[o] then
@@ -111,7 +112,7 @@ function _M.pformat(o, name, indent)
 	end
 
 	if name == nil then
-		if type(o) ~= 'table' then
+		if has__tostring(o) or type(o) ~= 'table' then
 			return serialize(o)
 		elseif next(o) == nil then
 			return '{}'
@@ -125,7 +126,7 @@ function _M.pformat(o, name, indent)
 			end
 			buf1 = buf1 .. indent .. '}'
 		end
-	elseif type(o) ~= 'table' then
+	elseif has__tostring(o) or type(o) ~= 'table' then
 		-- simple datum
 		return tostring(name) .. ' = ' .. serialize(o) .. ';\n'
 	else
