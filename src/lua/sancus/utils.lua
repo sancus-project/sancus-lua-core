@@ -42,10 +42,17 @@ function _M.sibling_modules()
 
 	if basedir then
 		for f in lfs.dir(basedir) do
-			if f ~= me then
-				local f, e = f:match("^(.*)%.([^.]+)$")
+			if f ~= "." and f ~= ".." and f ~= me then
+				local st
+				local fn, e = f:match("^(.*)%.([^.]+)$")
 				if e == "lua" or e == "so" or e == "dll" then
-					t[#t+1] = f
+					t[#t+1] = fn
+				else
+					fn = string.format("%s/%s/init.lua", basedir, f)
+					st = lfs.attributes(fn)
+					if st and st.mode == "file" then
+						t[#t+1] = f
+					end
 				end
 			end
 		end
