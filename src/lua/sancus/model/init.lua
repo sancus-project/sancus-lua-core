@@ -4,14 +4,26 @@
 -- Copyright (c) 2009 - 2012, Alejandro Mery <amery@geeks.cl>
 --
 
-local setmetatable, getmetatable = setmetatable, getmetatable
+local utils = require"sancus.utils"
+local sibling_modules = utils.sibling_modules
+
+local setmetatable, getmetatable, require = setmetatable, getmetatable, require
 local assert, error = assert, error
-local rawget, rawset, pairs, type = rawget, rawset, pairs, type
+local rawget, rawset, ipairs, pairs, type = rawget, rawset, ipairs, pairs, type
+local tostring = tostring
 local sformat = string.format
 
-local _M = {}
-local _MT = { __index = _M }
+local _M = { _NAME = ... }
 setfenv(1, _M)
+
+-- load type handlers
+--
+for _, x in ipairs(sibling_modules()) do
+	_M[x] = require(... .. "." .. x)
+end
+
+local MI = {}
+local MT = { __index = MI }
 
 -- set_field
 --
@@ -101,7 +113,7 @@ local function new()
 		get = get,
 		set = set,
 	}
-	return setmetatable(model, _MT)
+	return setmetatable(model, MT)
 end
 
 -- model:foo()
@@ -109,37 +121,37 @@ end
 local function validate_name(model, k)
 	assert(type(k) == 'string' and #k > 0,
 		sformat("%s: invalid property name", tostring(k)))
-	assert(model.P[k] == nil and mode[k] == nil and
+	assert(model.P[k] == nil and model[k] == nil and
 		model.F[k] == nil and model.T[k] == nil,
 		sformat("%s: name already in use", tostring(k)))
 end
 
-function prepare_add_field(model, k, validator)
-	validate_name(model, k)
-	assert(type(k) == 'function', sformat("%s: invalid validator", k))
+function MI:prepare_add_field(k, f)
+	validate_name(self, k)
+	assert(type(f) == 'function', sformat("%s: invalid validator (%q)", k, type(f)))
 
-	return {validator=validator, name=k}
+	return {validator=f, name=k}
 end
 
-function add_field(model, T, k, ...)
-	local f = T(model, k, ...)
+function MI:add_field(T, k, ...)
+	local f = T(self, k, ...)
 	assert(type(f) == "table" and f.validator and f.name)
 
-	model.F[k] = f
-	model.T[k] = T
+	self.F[k] = f
+	self.T[k] = T
 	return f
 end
 
-function add_property(model, k, f)
-	validate_name(model, k)
-	assert(type(k) == 'function', sformat("%s: invalid callback", k))
-	model.P[k] = f
+function MI:add_property(k, f)
+	validate_name(self, k)
+	assert(type(f) == 'function', sformat("%s: invalid callback (%q)", k, type(f)))
+	self.P[k] = f
 end
 
-function add_method(model, k, f)
-	validate_name(model, k)
+function MI:add_method(k, f)
+	validate_name(self, k)
 	assert(type(k) == 'function', sformat("%s: invalid callback", k))
-	model[k] = f
+	self[k] = f
 end
 
 setmetatable(_M, { __call = new })
