@@ -3,39 +3,46 @@
 -- Copyright (c) 2012, Alejandro Mery <amery@geeks.cl>
 --
 
+local ipairs, next, pairs, select, type = ipairs, next, pairs, select, type
+local tostring, string = tostring, string
+local getmetatable = getmetatable
+
 local _M = {
 	_stdout = io.stdout,
 	_stderr = io.stderr,
+	_NAME = ...,
 }
 
 assert(io.stdout.setvbuf, "io.stdout has been kidnapped before we could save it")
 
+setfenv(1, _M)
+
 -- write to stderr
 --
-function _M.stderr(...)
+function stderr(...)
 	if select('#', ...) > 1 then
-		return _M._stderr:write(string.format(...))
+		return _stderr:write(string.format(...))
 	else
-		return _M._stderr:write(...)
+		return _stderr:write(...)
 	end
 end
 
 -- write to stdout
 --
-function _M.stdout(...)
+function stdout(...)
 	if select('#', ...) > 1 then
-		return _M._stdout:write(string.format(...))
+		return _stdout:write(string.format(...))
 	else
-		return _M._stdout:write(...)
+		return _stdout:write(...)
 	end
 end
 
-function _M.stdout_buf(mode, size)
-	_M._stdout:setvbuf(mode, size)
+function stdout_buf(mode, size)
+	_stdout:setvbuf(mode, size)
 end
 
 -- POSIXish getopt()
-function _M.getopt(arg, options)
+function getopt(arg, options)
 	local opt, optind = {}, 1
 	local waiting
 
@@ -66,7 +73,7 @@ function _M.getopt(arg, options)
 					local t = v:sub(j, j)
 					local x = options:find(t, 1, true)
 					if t == ":" then
-						io.stderr:write(arg[0],": invalid option --'", t, "'\n")
+						stderr:write("%s: invalid option -- '%s'\n", arg[0], t)
 						opt["?"] = true
 					elseif x then
 						if options:sub(x+1, x+1) == ":" then
@@ -81,7 +88,7 @@ function _M.getopt(arg, options)
 							opt[t] = true
 						end
 					else
-						io.stderr:write(arg[0],": invalid option --'", t, "'\n")
+						stderr:write("%s: invalid option -- '%s'\n", arg[0], t)
 						opt["?"] = true
 					end
 					j = j + 1
@@ -101,7 +108,7 @@ function _M.getopt(arg, options)
 end
 
 --
-function _M.sibling_modules()
+function sibling_modules()
 	local source = debug.getinfo(2).source
 	local basedir, me = source:match("^@(.*[/\\])([^/\\]+)$")
 	local t = {}
@@ -128,7 +135,7 @@ end
 
 -- based on table.show() from
 -- http://lua-users.org/wiki/TableSerialization
-function _M.pformat(o, name, indent)
+function pformat(o, name, indent)
 	local buf1, buf2 = '', ''
 	indent = indent or ''
 
@@ -209,8 +216,8 @@ function _M.pformat(o, name, indent)
 	return buf1 .. buf2
 end
 
-function _M.pprint(t, name)
-	_M.stdout(_M.pformat(t, name))
+function pprint(t, name)
+	stdout(pformat(t, name))
 end
 
 return _M
