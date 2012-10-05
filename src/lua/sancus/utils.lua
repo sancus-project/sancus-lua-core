@@ -35,7 +35,7 @@ function _M.stdout_buf(mode, size)
 end
 
 -- POSIXish getopt()
-function getopt(arg, options)
+function _M.getopt(arg, options)
 	local opt, optind = {}, 1
 	local waiting
 
