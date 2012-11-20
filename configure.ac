@@ -5,6 +5,8 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([foreign dist-bzip2 -Wall -Werror])
 
+LT_INIT
+
 # lua.pc
 #
 PKG_CHECK_EXISTS([lua], lua_pc='lua', lua_pc='lua5.1')
@@ -39,6 +41,7 @@ AC_SUBST(INSTALL_LMOD, ${install_lmod})
 AC_CONFIG_FILES([sancus-lua.pc])
 AC_CONFIG_FILES([Makefile
 		 doc/Makefile
+		 src/cmod/Makefile
 		 src/lua/Makefile
 		 src/Makefile])
 AC_OUTPUT
