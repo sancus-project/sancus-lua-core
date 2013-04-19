@@ -4,8 +4,10 @@
 --
 
 local ipairs, next, pairs, select, type = ipairs, next, pairs, select, type
-local tostring, string = tostring, string
+local tostring, string, debug = tostring, string, debug
 local getmetatable = getmetatable
+
+local lfs = require"lfs"
 
 local _M = {
 	_stdout = io.stdout,
