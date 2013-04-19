@@ -43,6 +43,12 @@ function stdout_buf(mode, size)
 	_stdout:setvbuf(mode, size)
 end
 
+-- remove whitespace
+--
+function trim(s)
+	return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
+end
+
 -- POSIXish getopt()
 function getopt(arg, options)
 	local opt, optind = {}, 1
