@@ -29,6 +29,26 @@ function stderr(...)
 	end
 end
 
+function stderr_prefixed_lines(prefix, fmt, ...)
+	local lines, txt = 0, fmt or ""
+
+	if txt ~= "" then
+		if select('#', ...) > 0 then
+			txt = txt:format(...)
+		end
+
+		fmt = "%s: %s\n"
+		for l in txt:gmatch("[^\r\n]+") do
+			lines = lines + 1
+			_stderr:write(fmt:format(prefix, l))
+		end
+	end
+
+	if lines == 0 then
+		_stderr:write(prefix.."\n")
+	end
+end
+
 -- write to stdout
 --
 function stdout(...)
