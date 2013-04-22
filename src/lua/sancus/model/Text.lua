@@ -4,7 +4,7 @@
 -- Copyright (c) 2009 - 2012, Alejandro Mery <amery@geeks.cl>
 --
 
-local Class = require("sancus.object").Class
+local Class = require"sancus.object.Class"
 local tostring, type = tonumber, type
 
 setfenv(1, {})

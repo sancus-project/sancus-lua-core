@@ -1,3 +1,7 @@
+-- This file is part of sancus-lua-core
+-- <https://github.com/sancus-project/sancus-lua-core>
+--
+-- Copyright (c) 2013, Alejandro Mery <amery@geeks.cl>
 --
 
 local _class = {
@@ -21,6 +25,4 @@ function Class(c)
 	return c
 end
 
-return {
-	Class = Class,
-}
+return Class

@@ -4,8 +4,8 @@
 -- Copyright (c) 2009 - 2012, Alejandro Mery <amery@geeks.cl>
 --
 
-local Class = require("sancus.object").Class
-local Decimal = assert(require"sancus.model.Decimal")
+local Class = require"sancus.object.Class"
+local Decimal = require"sancus.model.Decimal"
 local tonumber, type, floor = tonumber, type, math.floor
 
 setfenv(1, {})
