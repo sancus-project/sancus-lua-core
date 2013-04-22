@@ -22,9 +22,6 @@ for _, x in ipairs(sibling_modules()) do
 	_M[x] = require(... .. "." .. x)
 end
 
-local MI = {}
-local MT = { __index = MI }
-
 -- set_field
 --
 local function rawset_field(o, k, v)
@@ -98,6 +95,12 @@ local function new_object(model, t)
 	return setmetatable(o, model)
 end
 
+local MI = {}
+local MT = {
+	__index = MI,
+	__call = new_object,
+}
+
 -- new model
 --
 local function new()
@@ -106,7 +109,6 @@ local function new()
 		F = {}, -- fields
 		T = {}, -- types
 
-		__call = new_object,
 		__index = get_field,
 		__newindex = set_field,
 
