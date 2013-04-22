@@ -7,4 +7,5 @@ nobase_dist_luadata_DATA = \
 	sancus/model/Decimal.lua sancus/model/Enum.lua \
 	sancus/model/Integer.lua sancus/model/Text.lua \
 	sancus/model/init.lua sancus/object/Class.lua \
-	sancus/object/init.lua sancus/utils.lua
+	sancus/object/Table.lua sancus/object/init.lua \
+	sancus/utils.lua
