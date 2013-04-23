@@ -152,7 +152,7 @@ end
 
 function MI:add_method(k, f)
 	validate_name(self, k)
-	assert(type(k) == 'function', sformat("%s: invalid callback", k))
+	assert(type(f) == 'function', sformat("%s: invalid callback (%q)", k, type(f)))
 	self[k] = f
 end
 
