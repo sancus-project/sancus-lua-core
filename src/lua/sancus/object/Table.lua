@@ -4,6 +4,12 @@
 -- Copyright (c) 2013, Alejandro Mery <amery@geeks.cl>
 --
 
+local assert, type, select, rawset = assert, type, select, rawset
+local setmetatable = setmetatable
+
+local _M = {}
+setfenv(1, _M)
+
 -- t[key] = object
 local function table_newindex(self, key_field, key, object)
 	assert(type(key) == "number" and key > 0, "invalid index")
@@ -60,6 +66,57 @@ local function table_full(self)
 	return self._count == self._max
 end
 
+-- iterator
+--
+local function table_iterator_next(self, prev, last, placeholder)
+	local o, i
+
+	if prev > last then
+		return
+	end
+
+	if null ~= nil then
+		i = prev + 1
+		o = self[i]
+		if o == nil then
+			o = placeholder
+		end
+		return i, o
+	else
+		for i = prev+1,last do
+			o = self[i]
+			if o ~= nil then
+				return i, o
+			end
+		end
+	end
+end
+
+local function table_iterator(self, from, to, placeholder)
+	if from == nil or from < 1 then
+		from = 1
+	end
+
+	if to == nil or to < 1 then
+		to = self._last
+	end
+
+	if self._max > 0 and to > self._max then
+		to = self._max
+	end
+
+	if to > 0 then
+		local f = function(_, prev)
+			return table_iterator_next(self, prev, to, placeholder)
+		end
+		return f, nil, 0
+	else
+		return function() end
+	end
+end
+
+--
+--
 function Table(key_field, C, max)
 	local self = { _last = -1, _count = 0 }
 	local MT
@@ -75,10 +132,7 @@ function Table(key_field, C, max)
 		__newindex = function(self, key, value)
 			return table_newindex(self, key_field, key, value)
 		end,
-		__call = function(self, from, to)
-			-- TODO: iterator
-			--return table_newentry(self, C, key, ...)
-		end,
+		__call = table_iterator,
 
 		max = table_max,
 		last = table_last,
