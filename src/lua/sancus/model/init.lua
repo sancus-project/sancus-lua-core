@@ -24,25 +24,33 @@ end
 
 -- set_field
 --
-local function rawset_field(o, k, v)
+function rawset_field(o, k, v)
 	local t = rawget(o, '__fields')
 	rawset(t, k, v)
 end
 
 local function set_field(o, k, v)
 	local model = getmetatable(o)
-	local f = model.F[k]
-	if f then
-		local ok, val = f.validator(f, v)
-		if ok then
-			rawset_field(o, k, val)
-		elseif v == nil and f.default ~= nil then
-			rawset_field(o, k, f.default)
-		else
-			error(sformat("%s: invalid value (%q)", k, tostring(v)), 2)
-		end
+
+	if model.PS[k] then -- property
+		model.PS[k](o, v)
+	elseif model.PG[k] then -- read-only property
+		error(sformat("%s: read-only property", k), 2)
 	else
-		error(sformat("%s: field not supported", k), 2)
+		-- normal field
+		local f = model.F[k]
+		if f then
+			local ok, val = f.validator(f, v)
+			if ok then
+				rawset_field(o, k, val)
+			elseif v == nil and f.default ~= nil then
+				rawset_field(o, k, f.default)
+			else
+				error(sformat("%s: invalid value (%q)", k, tostring(v)), 2)
+			end
+		else
+			error(sformat("%s: field not supported", k), 2)
+		end
 	end
 end
 
@@ -53,20 +61,24 @@ end
 
 -- get_field
 --
-local function rawget_field(o, k)
+function rawget_field(o, k)
 	local t = rawget(o, '__fields')
 	return rawget(t, k)
 end
 
 local function get_field(o, k)
-	local model, v = getmetatable(o), rawget_field(o, k)
+	local model = getmetatable(o)
 
-	if v ~= nil then -- field
-		return v
-	elseif model.P[k] then -- property
-		return model.P[k](o)
+	if model.PG[k] then -- property
+		return model.PG[k](o)
 	else
-		return model[k]
+		local v = rawget_field(o, k)
+
+		if v ~= nil then -- field
+			return v
+		else
+			return model[k]
+		end
 	end
 end
 
@@ -105,7 +117,8 @@ local MT = {
 --
 local function new()
 	local model = {
-		P = {}, -- properties
+		PG = {}, -- property getters
+		PS = {}, -- property setters
 		F = {}, -- fields
 		T = {}, -- types
 
@@ -123,7 +136,7 @@ end
 local function validate_name(model, k)
 	assert(type(k) == 'string' and #k > 0,
 		sformat("%s: invalid property name", tostring(k)))
-	assert(model.P[k] == nil and model[k] == nil and
+	assert(model.PG[k] == nil and model[k] == nil and
 		model.F[k] == nil and model.T[k] == nil,
 		sformat("%s: name already in use", tostring(k)))
 end
@@ -144,10 +157,15 @@ function MI:add_field(T, k, ...)
 	return f
 end
 
-function MI:add_property(k, f)
+function MI:add_property(k, getter, setter)
+	local tg, ts = type(getter), type(setter)
+
 	validate_name(self, k)
-	assert(type(f) == 'function', sformat("%s: invalid callback (%q)", k, type(f)))
-	self.P[k] = f
+	assert(tg == 'function', sformat("%s: invalid getter (%q)", k, tg))
+	assert(ts == 'function' or ts == 'nil', sformat("%s: invalid setter (%q)", k, ts))
+
+	self.PG[k] = getter
+	self.PS[k] = setter
 end
 
 function MI:add_method(k, f)
