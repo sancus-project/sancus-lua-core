@@ -6,6 +6,7 @@
 
 local assert, type, select, rawset = assert, type, select, rawset
 local setmetatable = setmetatable
+local tostring, tconcat = tostring, table.concat
 
 local _M = {}
 setfenv(1, _M)
@@ -64,6 +65,34 @@ local function table_empty(self)
 end
 local function table_full(self)
 	return self._count == self._max
+end
+
+--
+--
+local function table_json_encoded(self)
+	local max
+	local t = {}
+	if self._max > 0 then
+		max = self._max
+	else
+		max = self._last
+	end
+
+	for i,v in self(1, max, false) do
+		if v == false then
+			v = "null"
+		else
+			assert(v.json_encoded ~= nil, tostring(v) .. ": no json_encoded() provided")
+			v = v:json_encoded()
+		end
+		t[i] = v
+	end
+
+	if #t > 0 then
+		return "[" .. tconcat(t, ", ") .. "]"
+	else
+		return "[]"
+	end
 end
 
 -- iterator
@@ -138,6 +167,8 @@ function Table(key_field, C, max)
 		last = table_last,
 		empty = table_empty,
 		full = table_full,
+
+		json_encoded = table_json_encoded,
 
 		new = function(self, key, ...)
 			return table_newentry(self, C, key, ...)
