@@ -3,11 +3,14 @@
 -- Copyright (c) 2012, Alejandro Mery <amery@geeks.cl>
 --
 
-local ipairs, next, pairs, select, type = ipairs, next, pairs, select, type
+local rawpairs, rawipairs, rawnext  = pairs, ipairs, next
+local select, type = select, type
 local tostring, string, debug = tostring, string, debug
 local getmetatable = getmetatable
 
 local lfs = require"lfs"
+
+local _G = _G
 
 local _M = {
 	_stdout = io.stdout,
@@ -62,6 +65,28 @@ end
 function stdout_buf(mode, size)
 	_stdout:setvbuf(mode, size)
 end
+
+-- TODO: override pairs/ipairs/next ONLY in 5.1 or older
+--
+function pairs(t, ...)
+	local mt = getmetatable(t)
+	local f = mt ~= nil and mt.__pairs or rawpairs
+	return f(t, ...)
+end
+function ipairs(t, ...)
+	local mt = getmetatable(t)
+	local f = mt ~= nil and mt.__ipairs or rawipairs
+	return f(t, ...)
+end
+function next(t, ...)
+	local mt = getmetatable(t)
+	local f = mt ~= nil and mt.__next or rawnext
+	return f(t, ...)
+end
+
+_G["pairs"] = pairs
+_G["ipairs"] = pairs
+_G["next"] = next
 
 -- remove whitespace
 --
