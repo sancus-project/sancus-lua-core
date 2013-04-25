@@ -9,7 +9,9 @@ local sibling_modules = utils.sibling_modules
 
 local setmetatable, getmetatable, require = setmetatable, getmetatable, require
 local assert, error = assert, error
-local rawget, rawset, ipairs, pairs, type = rawget, rawset, ipairs, pairs, type
+
+local rawget, rawset, type = rawget, rawset, type
+local ipairs, pairs, next = ipairs, pairs, next
 local tostring = tostring
 local sformat = string.format
 
@@ -91,6 +93,20 @@ local function get(o, k, default)
 	end
 end
 
+local function model_pairs(self)
+	local model = getmetatable(self)
+
+	function model_next(state, prev)
+		local k, v = next(state, prev)
+		if v ~= nil then
+			v = get_field(self, k)
+		end
+		return k, v
+	end
+
+	return model_next, model.keys, nil
+end
+
 -- new object
 --
 local function new_object(model, t)
@@ -117,6 +133,8 @@ local MT = {
 --
 local function new()
 	local model = {
+		keys = {},
+
 		PG = {}, -- property getters
 		PS = {}, -- property setters
 		F = {}, -- fields
@@ -124,6 +142,8 @@ local function new()
 
 		__index = get_field,
 		__newindex = set_field,
+
+		__pairs = model_pairs,
 
 		get = get,
 		set = set,
@@ -136,8 +156,7 @@ end
 local function validate_name(model, k)
 	assert(type(k) == 'string' and #k > 0,
 		sformat("%s: invalid property name", tostring(k)))
-	assert(model.PG[k] == nil and model[k] == nil and
-		model.F[k] == nil and model.T[k] == nil,
+	assert(model.keys[k] == nil,
 		sformat("%s: name already in use", tostring(k)))
 end
 
@@ -152,8 +171,11 @@ function MI:add_field(T, k, ...)
 	local f = T(self, k, ...)
 	assert(type(f) == "table" and f.validator and f.name)
 
+	self.keys[k] = true
+
 	self.F[k] = f
 	self.T[k] = T
+
 	return f
 end
 
@@ -164,6 +186,8 @@ function MI:add_property(k, getter, setter)
 	assert(tg == 'function', sformat("%s: invalid getter (%q)", k, tg))
 	assert(ts == 'function' or ts == 'nil', sformat("%s: invalid setter (%q)", k, ts))
 
+	self.keys[k] = true
+
 	self.PG[k] = getter
 	self.PS[k] = setter
 end
@@ -171,6 +195,7 @@ end
 function MI:add_method(k, f)
 	validate_name(self, k)
 	assert(type(f) == 'function', sformat("%s: invalid callback (%q)", k, type(f)))
+
 	self[k] = f
 end
 
