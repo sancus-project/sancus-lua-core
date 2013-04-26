@@ -6,7 +6,7 @@
 
 local assert, type, select, rawset = assert, type, select, rawset
 local setmetatable = setmetatable
-local tostring, tconcat = tostring, table.concat
+local tostring, tonumber, tconcat = tostring, tonumber, table.concat
 
 local _M = {}
 setfenv(1, _M)
@@ -30,6 +30,15 @@ local function table_newindex(self, key_field, key, object)
 	end
 
 	rawset(self, key, object)
+end
+
+local function table_get(self, index)
+	if index ~= nil and type(index) ~= 'number' then
+		index = tonumber(index)
+	end
+	if index ~= nil then
+		return self[index]
+	end
 end
 
 -- t(key, ...) -> t[key] = C(key, ...)
@@ -174,6 +183,8 @@ function Table(key_field, C, max)
 		new = function(self, key, ...)
 			return table_newentry(self, C, key, ...)
 		end,
+
+		get = table_get,
 
 		_key_field = key_field,
 		_max = max,
