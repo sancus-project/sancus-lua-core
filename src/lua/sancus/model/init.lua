@@ -98,9 +98,15 @@ local function model_pairs(self)
 
 	function model_next(state, prev)
 		local k, v = next(state, prev)
-		if v ~= nil then
-			v = get_field(self, k)
+		if k ~= nil then
+			if v == false then
+				-- skip
+				return model_next(state, k)
+			else
+				v = get_field(self, k)
+			end
 		end
+
 		return k, v
 	end
 
@@ -179,14 +185,14 @@ function MI:add_field(T, k, ...)
 	return f
 end
 
-function MI:add_property(k, getter, setter)
+function MI:add_property(k, getter, setter, hidden)
 	local tg, ts = type(getter), type(setter)
 
 	validate_name(self, k)
 	assert(tg == 'function', sformat("%s: invalid getter (%q)", k, tg))
 	assert(ts == 'function' or ts == 'nil', sformat("%s: invalid setter (%q)", k, ts))
 
-	self.keys[k] = true
+	self.keys[k] = (hidden ~= true)
 
 	self.PG[k] = getter
 	self.PS[k] = setter
