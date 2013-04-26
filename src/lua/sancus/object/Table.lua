@@ -162,6 +162,7 @@ function Table(key_field, C, max)
 			return table_newindex(self, key_field, key, value)
 		end,
 		__call = table_iterator,
+		__ipairs = table_iterator,
 
 		max = table_max,
 		last = table_last,
