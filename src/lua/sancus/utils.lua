@@ -85,7 +85,7 @@ function next(t, ...)
 end
 
 _G["pairs"] = pairs
-_G["ipairs"] = pairs
+_G["ipairs"] = ipairs
 _G["next"] = next
 
 -- remove whitespace
