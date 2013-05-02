@@ -8,7 +8,7 @@ local utils = require"sancus.utils"
 local sibling_modules = utils.sibling_modules
 
 local setmetatable, getmetatable, require = setmetatable, getmetatable, require
-local assert, error = assert, error
+local assert, error, pcall = assert, error, pcall
 
 local rawget, rawset, type = rawget, rawset, type
 local ipairs, pairs, next = ipairs, pairs, next
