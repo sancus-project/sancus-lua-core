@@ -153,6 +153,27 @@ local function table_iterator(self, from, to, placeholder)
 	end
 end
 
+local function table_available(self, max)
+	local t = {}
+
+	max = tonumber(max) or self._max
+	if self._max > 0 then
+		if max < 0 or max > self._max then
+			max = self._max -- truncate
+		end
+	elseif max < 0 then
+		error "table_available: can't work on infinite tables unless a limit is given"
+	end
+
+	for i = 1,max do
+		if self[i] == nil then
+			t[#t+1] = i
+		end
+	end
+
+	return t
+end
+
 --
 --
 function Table(key_field, C, max)
@@ -177,6 +198,7 @@ function Table(key_field, C, max)
 		last = table_last,
 		empty = table_empty,
 		full = table_full,
+		available = table_available,
 
 		json_encoded = table_json_encoded,
 
