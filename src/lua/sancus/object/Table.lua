@@ -4,7 +4,8 @@
 -- Copyright (c) 2013, Alejandro Mery <amery@geeks.cl>
 --
 
-local assert, type, select, rawset = assert, type, select, rawset
+local assert, pcall = assert, pcall
+local type, select, rawset = type, select, rawset
 local setmetatable = setmetatable
 local tostring, tonumber, tconcat = tostring, tonumber, table.concat
 
@@ -52,10 +53,13 @@ local function table_newentry(self, C, key, ...)
 
 	o = C()
 	if type(o.init) == "function" then
-		o.init(key, ...)
+		local status, err = pcall(o.init, o, key, ...)
+		if not status then
+			return nil, err
+		end
+	elseif select('#', ...) > 0 then
+		return nil, "classes without init() can't take extra args"
 	else
-		assert(select('#', ...) == 0, "classes without init() can't take extra args")
-
 		o[self._key_field] = key
 	end
 
