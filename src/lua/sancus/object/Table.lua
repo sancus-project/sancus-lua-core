@@ -108,6 +108,36 @@ local function table_json_encoded(self)
 	end
 end
 
+--
+--
+local function table_after(self, id)
+	if not id or id < 0 then
+		id = 0
+	end
+
+	for i = id+1, self._last do
+		local e = self[i]
+
+		if e ~= nil then
+			return i, e
+		end
+	end
+end
+
+local function table_before(self, id)
+	if not id or id < 0 then
+		id = 0
+	end
+
+	for i = id-1, 1, -1 do
+		local e = self[i]
+
+		if e ~= nil then
+			return i, e
+		end
+	end
+end
+
 -- iterator
 --
 local function table_iterator_next(self, prev, last, placeholder)
@@ -203,6 +233,9 @@ function Table(key_field, C, max)
 		empty = table_empty,
 		full = table_full,
 		available = table_available,
+
+		before = table_before,
+		after = table_after,
 
 		json_encoded = table_json_encoded,
 
