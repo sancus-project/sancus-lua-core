@@ -37,7 +37,7 @@ local function set_field(o, k, v)
 	if model.PS[k] then -- property
 		model.PS[k](o, v)
 	elseif model.PG[k] then -- read-only property
-		error(sformat("%s: read-only property", k), 2)
+		error(sformat("%s: read-only property", k), 0)
 	else
 		-- normal field
 		local f = model.F[k]
@@ -48,10 +48,10 @@ local function set_field(o, k, v)
 			elseif v == nil and f.default ~= nil then
 				rawset_field(o, k, f.default)
 			else
-				error(sformat("%s: invalid value (%q)", k, tostring(v)), 2)
+				error(sformat("%s: invalid value (%q)", k, tostring(v)), 0)
 			end
 		else
-			error(sformat("%s: field not supported", k), 2)
+			error(sformat("%s: field not supported", k), 0)
 		end
 	end
 end
