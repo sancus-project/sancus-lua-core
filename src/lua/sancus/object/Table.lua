@@ -147,7 +147,7 @@ local function table_iterator_next(self, prev, last, placeholder)
 		return
 	end
 
-	if null ~= nil then
+	if placeholder ~= nil then
 		i = prev + 1
 		o = self[i]
 		if o == nil then
@@ -177,11 +177,11 @@ local function table_iterator(self, from, to, placeholder)
 		to = self._max
 	end
 
-	if to > 0 then
+	if to > (from-1) then
 		local f = function(_, prev)
 			return table_iterator_next(self, prev, to, placeholder)
 		end
-		return f, nil, 0
+		return f, nil, from-1
 	else
 		return function() end
 	end
