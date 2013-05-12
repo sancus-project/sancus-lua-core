@@ -7,6 +7,7 @@ local rawpairs, rawipairs, rawnext  = pairs, ipairs, next
 local select, type = select, type
 local tostring, string, debug = tostring, string, debug
 local getmetatable = getmetatable
+local tsort = table.sort
 
 local lfs = require"lfs"
 
@@ -75,6 +76,23 @@ function assertish(v, msg, ...)
 		end
 		error(msg, 0)
 	end
+end
+
+-- sorted keys iterator
+--
+function keys(t, f)
+	local keys, i = {}, 0
+	for k in pairs(t) do
+		keys[#keys+1] = k
+	end
+	tsort(keys, f)
+
+	local function keys_iter(_, _)
+		i = i + 1
+		return keys[i]
+	end
+
+	return keys_iter, keys, 0
 end
 
 -- TODO: override pairs/ipairs/next ONLY in 5.1 or older
