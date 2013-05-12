@@ -66,6 +66,17 @@ function stdout_buf(mode, size)
 	_stdout:setvbuf(mode, size)
 end
 
+-- not-prefixing and formating assert() alternative
+--
+function assertish(v, msg, ...)
+	if not v then
+		if type(msg) == 'string' and select('#', ...) > 0 then
+			msg = msg:format(...)
+		end
+		error(msg, 0)
+	end
+end
+
 -- TODO: override pairs/ipairs/next ONLY in 5.1 or older
 --
 function pairs(t, ...)
