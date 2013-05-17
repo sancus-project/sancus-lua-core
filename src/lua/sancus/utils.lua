@@ -4,6 +4,8 @@
 --
 
 local rawpairs, rawipairs, rawnext  = pairs, ipairs, next
+local rawerror, rawassert = error, assert
+
 local select, type = select, type
 local tostring, string, debug = tostring, string, debug
 local getmetatable = getmetatable
@@ -67,14 +69,45 @@ function stdout_buf(mode, size)
 	_stdout:setvbuf(mode, size)
 end
 
+-- format-friendly error()
+--
+function error(msg, level, ...)
+	if type(msg) == 'string' and select('#', ...) > 0 then
+		msg = msg:format(...)
+	end
+
+	if not level then
+		level = 2
+	elseif level > 0 then
+		level = level + 1
+	else
+		level = 0
+	end
+
+	rawerror(msg, level)
+end
+
+-- format-friendly assert()
+--
+function assert(v, msg, level, ...)
+	if not v then
+		if not level then
+			level = 2
+		elseif level > 0 then
+			level = level + 1
+		else
+			level = 0
+		end
+
+		error(msg, level, ...)
+	end
+end
+
 -- not-prefixing and formating assert() alternative
 --
 function assertish(v, msg, ...)
 	if not v then
-		if type(msg) == 'string' and select('#', ...) > 0 then
-			msg = msg:format(...)
-		end
-		error(msg, 0)
+		error(msg, 0, ...)
 	end
 end
 
