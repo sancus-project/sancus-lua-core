@@ -113,12 +113,17 @@ end
 
 -- sorted keys iterator
 --
-function keys(t, f)
-	local keys, i = {}, 0
+function sorted_keys(t, f)
+	local keys = {}
 	for k in pairs(t) do
 		keys[#keys+1] = k
 	end
 	tsort(keys, f)
+	return keys
+end
+
+function keys(t, f)
+	local keys, i = sorted_keys(t, f), 0
 
 	local function keys_iter(_, _)
 		i = i + 1
