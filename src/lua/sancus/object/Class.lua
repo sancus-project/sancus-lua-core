@@ -38,7 +38,7 @@ end
 
 function Class(c)
 	c = c or {}
-	c.__index = c
+	c.__index = c.__index or c
 
 	if not c.new then
 		if not c.init then
