@@ -11,6 +11,7 @@ nobase_dist_luadata_DATA = \
 	sancus/model/Text.lua \
 	sancus/model/init.lua \
 	sancus/object/Class.lua \
+	sancus/object/Enum.lua \
 	sancus/object/Table.lua \
 	sancus/object/init.lua \
 	sancus/utils.lua
