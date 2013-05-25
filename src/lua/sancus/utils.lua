@@ -155,6 +155,26 @@ _G["pairs"] = pairs
 _G["ipairs"] = ipairs
 _G["next"] = next
 
+function len(v)
+	local mt, t
+	-- nil
+	if v == nil then
+		return 0
+	end
+
+	-- __len meta function
+	mt = getmetatable(v)
+	if mt and mt.__len then
+		return mt.__len(v)
+	end
+
+	t = type(v)
+	if t ~= "table" and t ~= "string" then
+		v = tostring(v)
+	end
+	return #v
+end
+
 -- remove whitespace
 --
 function trim(s)
