@@ -57,8 +57,7 @@ local function set_field(o, k, v)
 end
 
 local function set(o, k, v)
-	local f = function() set_field(o, k, v) end
-	return pcall(f)
+	return pcall(set_field, o, k, v)
 end
 
 -- get_field
