@@ -40,6 +40,10 @@ Enum = {
 	__pairs = enum_iter,
 	__call = enum_iter,
 
+	__len = function(self)
+		return #self._keys
+	end,
+
 	-- key access
 	--
 	__index = function(self, key)
