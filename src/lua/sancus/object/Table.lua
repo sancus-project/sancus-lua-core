@@ -76,6 +76,9 @@ end
 local function table_empty(self)
 	return (self._count == 0)
 end
+local function table_len(self)
+	return self._count
+end
 local function table_full(self)
 	return self._count == self._max
 end
@@ -227,6 +230,9 @@ function Table(key_field, C, max)
 		end,
 		__call = table_iterator,
 		__ipairs = table_iterator,
+		__pairs = table_iterator,
+
+		__len = table_len,
 
 		max = table_max,
 		last = table_last,
