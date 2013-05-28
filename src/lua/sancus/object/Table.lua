@@ -146,7 +146,7 @@ end
 local function table_iterator_next(self, prev, last, placeholder)
 	local o, i
 
-	if prev > last then
+	if prev >= last then
 		return
 	end
 
