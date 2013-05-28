@@ -86,15 +86,9 @@ end
 --
 --
 local function table_json_encoded(self)
-	local max
 	local t = {}
-	if self._max > 0 then
-		max = self._max
-	else
-		max = self._last
-	end
 
-	for i,v in self(1, max, false) do
+	for i,v in self(1, self._last, false) do
 		if v == false then
 			v = "null"
 		else
