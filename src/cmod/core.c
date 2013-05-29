@@ -13,6 +13,7 @@ static const struct luaL_Reg core[] = {
 
 int luaopen_sancus_core(lua_State *L)
 {
+	fputs("luaopen_sancus_core\n", stderr);
 	luaL_register(L, "sancus.core", core);
 	return 1;
 }

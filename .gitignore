@@ -4,3 +4,4 @@ build-aux
 configure
 Makefile
 Makefile.in
+*.swp
